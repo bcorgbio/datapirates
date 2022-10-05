@@ -3,7 +3,14 @@ title: "Module 5"
 author: "Data Pirates"
 date: "2022-10-05"
 output: html_document
+biography: 
 ---
+# Introduction
+# Methods
+# Results
+# Discussion
+# Author Contribution
+# References
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
