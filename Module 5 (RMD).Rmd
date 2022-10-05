@@ -3,7 +3,7 @@ title: "Module 5"
 author: "Data Pirates"
 date: "2022-10-05"
 output: html_document
-bibliography: DataPirates_SOURCES.bib
+bibliography: DataPirates.bib
 ---
 # Introduction
 # Methods
