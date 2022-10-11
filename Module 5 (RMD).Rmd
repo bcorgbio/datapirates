@@ -45,6 +45,10 @@ Based off of the findings in the plot above, it appears that body temperature fl
 
 # Discussion
 
+@fortney1985exercise
+@gleeson1998temperature
+
+
 # Author Contribution
 Chris - Introduction, Methods
 Alexa - Recorded, Saved, and Properly Named Data
