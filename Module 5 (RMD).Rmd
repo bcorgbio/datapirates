@@ -48,9 +48,8 @@ Based off of the findings in the plot above, it appears that body temperature fl
 @fortney1985exercise
 @gleeson1998temperature
 
-
 # Author Contribution
-Chris - Introduction, Methods
+Chris - Wrote Introduction and Methods paragraphs
 Alexa - Recorded, Saved, and Properly Named Data
 Ellie - Put metadata in table and created results graph; wrote results narrative on findings. 
 Tori - 
