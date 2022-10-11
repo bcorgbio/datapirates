@@ -36,8 +36,9 @@ int currentTime;
 void setup() {
   Serial.begin(9600);
   Serial.println(F("DHTxx test!"));
-
+  
   dht.begin();
+  Serial.println("ms,degC");
 }
 
 void loop() {
