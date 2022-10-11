@@ -53,4 +53,5 @@ Chris - Wrote Introduction and Methods paragraphs
 Alexa - Recorded, Saved, and Properly Named Data
 Ellie - Put metadata in table and created results graph; wrote results narrative on findings. 
 Tori - 
+
 # References
