@@ -1,0 +1,32 @@
+---
+title: "Module 6 Report"
+author: "Data Pirates"
+date: "2022-11-06"
+output: html_document
+bibliography: BIOL3140.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
+```
+
+## Introduction
+There is some data to suggest that the hind- and forewings of species of the Lepidoptera play varying roles in flight and other functions of the species. While some studies have attempted to study the relationship between wing and function and the changing of these wings evolutionarily over time @betts1988wing, there are few studies that analyze large enough samples to provide true insight into the intriciacies of these evolving traits. Through a digital analysis of ~200 species of Lepidopteraa fore- and hindwings, this study sets out to discuss the varying evolutionary rates between hind- and forewings, the presence of significant evolutionary rate shifts for specific, major Lepidoptera lineages, and the potential correlation between hind- and forewing shapes. 
+
+
+## Methods
+```{r}
+#what we are going to need to include 
+#comparison of evolutionary rates for fore and hind wing 
+#comparison rates to the tree for different clades lineage specific 
+#visualizing nodes with exceptional shifts 
+#plotting of PIC analysis 
+#r2 values 
+
+```
+
+## Results
+## Discussion
+## Author Contribution
+## References
+
