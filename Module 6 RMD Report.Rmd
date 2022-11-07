@@ -1,0 +1,32 @@
+---
+title: "Module 6 Report"
+author: "Data Pirates"
+date: "2022-11-06"
+output: html_document
+bibliography: BIOL3140.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
+```
+
+## Introduction
+There is some data to suggest that the hind- and forewings of species of the Lepidoptera play varying roles in flight and other functions of the species. While some studies have attempted to study the relationship between wing and function and the changing of these wings evolutionarily over time @betts1988wing, there are few studies that analyze large enough samples to provide true insight into the intricacies of these evolving traits. Through a digital analysis of ~200 species of Lepidoptera fore- and hindwings, this study sets out to discuss the varying evolutionary rates between hind- and forewings, the presence of significant evolutionary rate shifts for specific, major Lepidoptera lineages, and the potential correlation between hind- and forewing shapes. 
+
+## Methods
+*Are the rates of wing-shape evolution different between the hind- and forewing? By how much?*
+In order to determine if the rates of wing-shape evolution in the Lepidoptera were different between the hind- and forewing, photos of images across the order were compiled by Professor Christopher Kenaley using images from the Global Biodiversity Information Facility database. Around 200 species total were included in this report. Wing species were outlined and digitized using the image analysis software FIJI, FIJI is just ImageJ. Scales were set if none were present, and the images were mirrored horizontally if the right wing was damaged. The polygon tool was used to trace the wings with around 20-30 points per wing. The origin tracing point from wing to wing was as consistent as the human eye can determine. Results were saved according to the hind- or forewing. Both the hind- and forewing were included in the same image for each species, so file names were used in order to separate them. The file names were subject to identifier data given to us by Professor Christopher Kenaley. Shape analysis was performed on the manually-digitized outlines using an Elliptical Fourier Analysis (EFA) in order to describe wing shapes. A Procrustes transformation was applied to the digitizations to account for the arbitrary differences in wing size by translating, rotating, and scaling the outlines for better analysis of their shape. A Principal Components Analysis (PCA) was then performed to quantify the variance observed by minimizing the number of variables in the data set into principal components (PC). The phylogenetic tree was modified in order to exclusively include the species identified with PCA data. The hind- and forewing principal components were separated using Brownian Motion. All of these operations were run using the R package “Momocs.” Outlines were analyzed according to whether they were hind- or forewings, to yield PC scores specific to their characteristics.
+*Have major lineages of the Lepidoptera undergone significant shifts in evolutionary rate?*
+In order to determine if major lineages of the Lepidoptera have undergone significant shifts in evolutionary rates, Professor Christopher Kenaley provided us with the phylogenetic tree created by @kawahara2019. Our group, datapirates, used this resource throughout the analysis. In addition to this phylogenetic tree, the R package “RRphylo” was used to determine the evolutionary rate based on wing shape. The phylogenetic ridge regression which we used comes from @kratsch2014. This determined any statistically significant shift in shape change based on the Lepidoptera’s clades yielding the name of the clade and the rate of evolutionary shift.
+*Are hind- and forewing shapes correlated?*
+In order to determine if hind- and forewing shapes are correlated, the phylogenetic independent contrast (PIC) was performed on the principal components (PC) data to separate the data from one another, summarize the character change, and estimate the character change across the phylogeny. THe PC values of both hind- and forewing data were compared using a linear model, and analysis was performed to determine if changes were statistically significant.
+## Results
+
+## Discussion
+
+## Author Contribution
+Ellie Falanga - Digitization, Introduction, & Results
+Tori Newton - Digitization, & Discussion
+Alexa Lombardi - Digitization, & Methods 
+Chris Lang - Digitization
+## References
