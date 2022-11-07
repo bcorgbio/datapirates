@@ -7,7 +7,7 @@ bibliography: BIOL3140_datapirates.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message=FALSE)
+knitr::opts_chunk$set(echo = FALSE, message=FALSE)
 ```
 
 ## Introduction
@@ -17,10 +17,262 @@ There is some data to suggest that the hind- and forewings of species of the Lep
 *Are the rates of wing-shape evolution different between the hind- and forewing? By how much?*
 In order to determine if the rates of wing-shape evolution in the Lepidoptera were different between the hind- and forewing, photos of images across the order were compiled by Professor Christopher Kenaley using images from the Global Biodiversity Information Facility database. Around 200 species total were included in this report. Wing species were outlined and digitized using the image analysis software FIJI, FIJI is just ImageJ. Scales were set if none were present, and the images were mirrored horizontally if the right wing was damaged. The polygon tool was used to trace the wings with around 20-30 points per wing. The origin tracing point from wing to wing was as consistent as the human eye can determine. Results were saved according to the hind- or forewing. Both the hind- and forewing were included in the same image for each species, so file names were used in order to separate them. The file names were subject to identifier data given to us by Professor Christopher Kenaley. Shape analysis was performed on the manually-digitized outlines using an Elliptical Fourier Analysis (EFA) in order to describe wing shapes. A Procrustes transformation was applied to the digitizations to account for the arbitrary differences in wing size by translating, rotating, and scaling the outlines for better analysis of their shape. A Principal Components Analysis (PCA) was then performed to quantify the variance observed by minimizing the number of variables in the data set into principal components (PC). The phylogenetic tree was modified in order to exclusively include the species identified with PCA data. The hind- and forewing principal components were separated using Brownian Motion. All of these operations were run using the R package “Momocs.” Outlines were analyzed according to whether they were hind- or forewings, to yield PC scores specific to their characteristics.
 *Have major lineages of the Lepidoptera undergone significant shifts in evolutionary rate?*
-In order to determine if major lineages of the Lepidoptera have undergone significant shifts in evolutionary rates, Professor Christopher Kenaley provided us with the phylogenetic tree created by @kawahara2019. Our group, datapirates, used this resource throughout the analysis. In addition to this phylogenetic tree, the R package “RRphylo” was used to determine the evolutionary rate based on wing shape. The phylogenetic ridge regression which we used comes from @kratsch2014. This determined any statistically significant shift in shape change based on the Lepidoptera’s clades yielding the name of the clade and the rate of evolutionary shift.
+In order to determine if major lineages of the Lepidoptera have undergone significant shifts in evolutionary rates, Professor Christopher Kenaley provided us with the phylogenetic tree created by @kawahara2019phylogenomics Our group, datapirates, used this resource throughout the analysis. In addition to this phylogenetic tree, the R package “RRphylo” was used to determine the evolutionary rate based on wing shape. The phylogenetic ridge regression which we used comes from @kratsch2014ridgerace This determined any statistically significant shift in shape change based on the Lepidoptera’s clades yielding the name of the clade and the rate of evolutionary shift.
 *Are hind- and forewing shapes correlated?*
 In order to determine if hind- and forewing shapes are correlated, the phylogenetic independent contrast (PIC) was performed on the principal components (PC) data to separate the data from one another, summarize the character change, and estimate the character change across the phylogeny. THe PC values of both hind- and forewing data were compared using a linear model, and analysis was performed to determine if changes were statistically significant.
 ## Results
+
+```{r,"loading libraries"}
+library(tidyverse)
+library(Momocs)
+library(ape)
+library(phytools)
+library(RRphylo)
+library(ggtree)
+library(wesanderson)
+library(knitr)
+```
+```{r,"loading in data files"}
+lep.tree <- ladderize(ape::read.tree("lep_tree2.tre"))
+lep.tree$tip.label <- gsub("_"," ",lep.tree$tip.label)
+lep.sp <- read_csv("lep_image_data.csv")
+tax.names <- readRDS("Lep_classification.RDS")
+f <- list.files("class_out_data",pattern=".txt",full.names = TRUE)
+```
+
+```{r,results="hide"}
+out.df <- vroom::vroom(f, id = "filename")
+out.df <- out.df %>% 
+  mutate(wing=gsub("XY_.+_(hindwing|forewing)\\..+","\\1",basename(filename))) %>% 
+  na.omit()
+outs.l <- sapply(f,function(x) out.df %>% filter(filename==x) %>% select(X,Y) %>% as.matrix)
+wings <- gsub("XY_.+_(hindwing|forewing)\\..+","\\1",basename(names(outs.l)))
+outs <-  outs.l %>% 
+  Out(fac=list(wing=wings)) %>% 
+  coo_flipx()
+forewings <- outs %>% 
+  filter(wing=="forewing")
+hindwings <- outs %>% 
+  filter(wing=="hindwing")
+fore.min <- forewings %>% 
+  coo_nb() %>% 
+  min()
+hind.min <- hindwings %>% 
+  coo_nb() %>% 
+  min()
+forewing.pca <- forewings %>%
+  coo_interpolate(fore.min) %>%
+  coo_align()  %>%
+  coo_slide(id=1) %>% 
+  fgProcrustes() %>% 
+  efourier(norm=FALSE) %>% 
+  PCA()
+hindwing.pca <-hindwings %>% 
+  coo_interpolate(hind.min) %>% 
+  coo_align()  %>%
+  coo_slide(id=1) %>% 
+  fgProcrustes() %>% 
+  efourier(norm=FALSE) %>% 
+  PCA()
+```
+```{r,"creating new tibble with PC1 and PC2 and species names"}
+out.data <- tibble(xy.file=basename(names(outs))) %>% 
+  mutate(identifier=gsub("XY_|_hindwing|_forewing|.txt","",xy.file)) %>% 
+  left_join(lep.sp)
+hindwing.pca2 <-  tibble(xy.file=basename(rownames(hindwing.pca$x)),PC1=hindwing.pca$x[,1],PC2=hindwing.pca$x[,2]) %>% 
+  left_join(out.data)
+forewing.pca2 <-  tibble(xy.file=basename(rownames(forewing.pca$x)),PC1=forewing.pca$x[,1],PC2=forewing.pca$x[,2])%>% 
+  left_join(out.data)
+drops <- lep.tree$tip.label[!lep.tree$tip.label%in%unique(out.data$species)]
+lep.tree2 <- drop.tip(lep.tree,drops)
+#pc1s
+hind.pc1 <- hindwing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC1=mean(PC1)) %>% 
+  pull
+names(hind.pc1) <-  hindwing.pca2%>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC1=mean(PC1)) %>% 
+  pull(species)
+fore.pc1 <- forewing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC1=mean(PC1)) %>% 
+  pull(PC1)
+names(fore.pc1) <-  forewing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC1=mean(PC1)) %>% 
+  pull(species)
+#PC2s
+hind.pc2 <- hindwing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC2=mean(PC2)) %>% 
+  pull(PC2)
+names(hind.pc2) <-  hindwing.pca2%>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>%
+  summarize(PC2=mean(PC2)) %>% 
+  pull(species)
+fore.pc2 <- forewing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC2=mean(PC2)) %>% 
+  pull(PC2)
+names(fore.pc2) <-  forewing.pca2 %>% 
+  filter(species%in% lep.tree2$tip.label) %>% 
+  group_by(species) %>% 
+  summarize(PC2=mean(PC2)) %>% 
+  pull(species)
+```
+
+```{r,"plotting PCA forewing and hindwing",fig.cap="PC Analysis for Forewing"}
+forewing.pca %>% 
+  plot_PCA(title = "forewings")
+```
+```{r,fig.cap="PC Analysis for Hindwing"}
+hindwing.pca %>% 
+  plot_PCA(title = "hindwings")
+```
+
+The plots above display a  visual representation of the principal components analysis, describing the important variance among average wing-shape of the varying species for both the fore- and hind-wing data. This analysis indicated a higher initial variance among forewing shape, as seen in a 69.1% PC1 compared to hindwing's 46.1% PC1, and a smaller secondary variance for forewing shape samples, as represented by PC2 representations of variation. 
+
+```{r,"question 1 - using brownian and PCA to see if hind + fore wings vary in evolutionary rate"}
+#liklihood of rates across the tree
+forePC1.BM<-brownie.lite(lep.tree2,fore.pc1*10)
+hindPC1.BM<-brownie.lite(lep.tree2,hind.pc1*10)
+forePC2.BM<-brownie.lite(lep.tree2,fore.pc2*10)
+hindPC2.BM<-brownie.lite(lep.tree2,hind.pc2*10)
+```
+
+```{r,"Table of PC values"}
+pcvaluetibble <- tibble(AnalysisLevel="PC1",Wing="Forewing",EvolutionaryRateEstimates=forePC1.BM$sig2.single)
+pcvaluetable <- pcvaluetibble%>%
+  add_row(tibble(AnalysisLevel="PC1",Wing="Hindwing",EvolutionaryRateEstimates=hindPC1.BM$sig2.single))%>%
+  add_row(tibble(AnalysisLevel="PC2",Wing="Forewing",EvolutionaryRateEstimates=forePC2.BM$sig2.single))%>%
+  add_row(tibble(AnalysisLevel="PC2",Wing="Hindwing",EvolutionaryRateEstimates=hindPC2.BM$sig2.single))
+pcvaluetable%>%
+  kable(caption="PCA Values for Fore- and Hindwing of species of lepidoptera")
+```
+
+To continue the analysis on varying hind- and forewing evolutionary rate change, we calculated evolutionary rate estimates of wing shape over the phylogenetic tree using the “noncensored test” method @o2006testing. These values are displayed in the table above for comparison among PC scores / wing combinations. 
+
+```{r, "computing rates among the branches"}
+hindPC1.RR <- RRphylo(tree=lep.tree2,y=hind.pc1)
+forePC1.RR <- RRphylo(tree=lep.tree2,y=fore.pc1)
+hindPC2.RR <- RRphylo(tree=lep.tree2,y=hind.pc2)
+forePC2.RR <- RRphylo(tree=lep.tree2,y=fore.pc2)
+```
+```{r, "do individual clades evolve at different rates compared to tree"}
+hindPC1.SS <-  search.shift(RR=hindPC1.RR,status.type="clade")
+forePC1.SS <- search.shift(RR=forePC1.RR,status.type="clade")
+hindPC2.SS <- search.shift(RR=hindPC2.RR,status.type="clade")
+forePC2.SS <- search.shift(RR=forePC2.RR,status.type="clade")
+```
+```{r,"establishing Kenaley function to extract lineage names"}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("ggtree")
+
+plot_SS <- function(tre=NULL,SS=NULL,tax=NULL){
+  nodes <- as.numeric(rownames(SS$single.clades))
+  pal <- wes_palette("Zissou1",n=length(nodes))
+  sp <- list()
+  for(i in nodes){
+    sp.i <- extract.clade(tre,i)$tip.label
+    #print(head(tax))
+    sub.names <- lapply(tax,function(x) x[x%in%sp.i]) 
+    in.clades <- lapply(sub.names,function(x) length(x)>0) 
+    all.of.clade <- lapply(sub.names,function(x) all(sapply(sp.i,function(z) z%in%x))) 
+    high.clade <- names(sub.names)[last(which(all.of.clade==T))]
+    all.clades <- names(sub.names)[which(in.clades==T)]
+    crown <- ""
+    if(high.clade!=last(names(sub.names))) crown <- "crown-"
+    sub.clades <- NULL
+    if(length(grepl("oidea",all.clades))>0) sub.clades <- all.clades[grepl("oidea",all.clades)]
+    high.clade2 <- paste0(crown,high.clade,": ",paste0(sub.clades,collapse = "+"))
+    sp[[paste0(i)]] <- tibble(n=i,species=sp.i,clade=high.clade2)
+  }
+  d <- do.call(rbind,sp)%>% 
+    rename(label=species) 
+  d2 <-  d %>% rename(clade_name=clade) 
+  p <- ggtree(tre)+ scale_y_reverse()
+  p$data <- p$data %>% left_join(d) %>% left_join(tibble(node=nodes,SS$single.clades) %>% mutate(shift=ifelse(rate.difference>0,"+","-")))
+  p <-  p+geom_tiplab(aes(col=clade),geom="text",size=1.2)+
+    geom_cladelab(data=d2,mapping=aes(node=n,col=clade_name,label=clade_name),offset=1,size=1.5)+
+    geom_hilight(data=d2,mapping = aes(node = n,fill=clade_name),alpha = 0.01)+
+    scale_fill_manual(values = pal)+
+    scale_color_manual(values = pal)+
+    theme(legend.position = "none")+geom_nodepoint(mapping=aes(subset = shift =="-"), size=5, shape=25,fill='blue',color='blue',alpha=0.7)+
+    geom_nodepoint(mapping=aes(subset = shift =="+"), size=5, shape=24, fill='red',color='red',alpha=0.7)
+  p <- p+xlim(NA,6)
+  res <- tibble(n=nodes,SS$single.clades) %>% left_join(d %>% select(n,clade) %>% unique)
+  return(list(plot=p,res=res))
+}
+```
+```{r,"plotting phylogenetic ridge regression",fig.cap="Exceptional rate changes by lineage, for hindwing PC1"}
+hindPC1.res <- plot_SS(lep.tree2,hindPC1.SS,tax = tax.names)
+hindPC1.res$plot
+```
+```{r,fig.cap="Exceptional rate changes by lineage, for forewing PC1"}
+forePC1.res <- plot_SS(lep.tree2,forePC1.SS,tax = tax.names)
+forePC1.res$plot
+```
+```{r,fig.cap="Exceptional rate changes by lineage, for hindwing PC2"}
+hindPC2.res <- plot_SS(lep.tree2,hindPC2.SS,tax = tax.names)
+hindPC2.res$plot
+```
+```{r,fig.cap="Exceptional rate changes by lineage, for forewing PC2"}
+forePC2.res <- plot_SS(lep.tree2,forePC2.SS,tax = tax.names)
+forePC2.res$plot
+```
+
+
+The figures above display the results of @kratsch2014ridgerace phylogenetic ridge regression method, which sets out to isolate which major groups of Lepidoptera have undergone exceptional changes in the rate of their wing-shape evolution. This method was carried out using hindwing and forewing PC1 and PC2 data and indicates via the arrow which specific nodes within the crown underwent rate change. 
+
+```{r,"shape evolution correlation utilizing PIC"}
+hindPC1.pic <- pic(hind.pc1,phy = lep.tree2)
+forePC1.pic <- pic(fore.pc1,phy = lep.tree2)
+hindPC2.pic <- pic(hind.pc2,phy = lep.tree2)
+forePC2.pic <- pic(fore.pc2,phy = lep.tree2)
+```
+```{r, "plotting PIC analysis",fig.cap="Looking at shape evolution correlation among hind- and forewing using a PIC analysis for PC1"}
+PC1.pic <- tibble(
+  hind=hindPC1.pic,
+  fore=forePC1.pic
+)
+PC1.pic %>% 
+  ggplot(aes(x=fore,y=hind))+geom_point()+geom_smooth(method="lm")
+```
+```{r,fig.cap="Looking at shape evolution correlation among hind- and forewing using a PIC analysis for PC2"}
+PC2.pic <- tibble(
+  hind=hindPC2.pic,
+  fore=forePC2.pic
+)
+PC2.pic %>% 
+  ggplot(aes(x=fore,y=hind))+geom_point()+geom_smooth(method="lm")
+```
+
+
+These plots display the results of a phylogenetic independent contrasts analysis for both stored PC vectors, to see the relationship between hind- and forewing shape evolutionary change rates. From  initial observation, there appears to be some correlation between hind- and forewing, as displayed in both of the plots. 
+
+```{r,"collecting r2 values",results="hide"}
+summary(lm(hind~fore,PC1.pic))
+summary(lm(hind~fore,PC2.pic))
+```
+```{r,"printing r2 value in table"}
+r2valuetibble <- tibble(AnalysisLevel="PC1",R2="0.4476")
+r2valuetable <- r2valuetibble%>%
+  add_row(tibble(AnalysisLevel="PC2",R2="0.00408"))
+r2valuetable%>%
+  kable(caption="R2 values for PIC analysis for each PC vector")
+```
+
+After completing a summary analysis of the PIC analysis regression model, R2 values were obtained and are displayed in the table above, acting as a quantitative indication for the degree of correlation among the hind and forewing evolutionary shape changes. 
+
 
 ## Discussion
 
