@@ -21,7 +21,6 @@ In order to determine if major lineages of the Lepidoptera have undergone signif
 *Are hind- and forewing shapes correlated?*
 In order to determine if hind- and forewing shapes are correlated, the phylogenetic independent contrast (PIC) was performed on the principal components (PC) data to separate the data from one another, summarize the character change, and estimate the character change across the phylogeny. THe PC values of both hind- and forewing data were compared using a linear model, and analysis was performed to determine if changes were statistically significant.
 
-
 ## Results
 
 ```{r,"loading libraries"}
@@ -232,7 +231,6 @@ forePC2.res <- plot_SS(lep.tree2,forePC2.SS,tax = tax.names)
 forePC2.res$plot
 ```
 
-
 The figures above display the results of @kratsch2014ridgerace phylogenetic ridge regression method, which sets out to isolate which major groups of Lepidoptera have undergone exceptional changes in the rate of their wing-shape evolution. This method was carried out using hindwing and forewing PC1 and PC2 data and indicates via the arrow which specific nodes within the crown underwent rate change. 
 
 ```{r,"shape evolution correlation utilizing PIC"}
@@ -258,7 +256,6 @@ PC2.pic %>%
   ggplot(aes(x=fore,y=hind))+geom_point()+geom_smooth(method="lm")
 ```
 
-
 These plots display the results of a phylogenetic independent contrasts analysis for both stored PC vectors, to see the relationship between hind- and forewing shape evolutionary change rates. From  initial observation, there appears to be some correlation between hind- and forewing, as displayed in both of the plots. 
 
 ```{r,"collecting r2 values",results="hide"}
@@ -275,14 +272,11 @@ r2valuetable%>%
 
 After completing a summary analysis of the PIC analysis regression model, R2 values were obtained and are displayed in the table above, acting as a quantitative indication for the degree of correlation among the hind and forewing evolutionary shape changes. 
 
-
 ## Discussion
-
 As indicated by the PC analysis and the evolutionary rate estimates calculated, the rates of wing-shape evolution are different between hing- and forewing of the species of Lepidoptera analyzed. The hindwing shape evolution rate seems to have higher overall rates of change than that of forewing, indicating that hindwing is more rapidly evolving. 
 
-There are two major lineages of the Lepidoptera that appear to have undergone signficiant shifts in evolutionary rate, as indicated by the phylogenetic ridge regression method. For both the hindwing and forewing, the lineages Obtectomera: Papilloma and Macroheterocera: Noctuoidea display exceptional shifts in evolutionary rate for fore- and hindwing shapes.  
-
-Though there seems to be visual confirmatino that hind and forewing shape evolution is correlated, through the R2 values displayed in the table above and @owens2020comparative paper, it appears that they are not strongly correlated, and most likely evolve independently of each other. This could potentially be an effect of their differing functions, which may lead to varying evolutionary trajectories and evolutionary rate changes @chazot2016morpho. 
+There are two major lineages of the Lepidoptera that appear to have undergone significant shifts in evolutionary rate, as indicated by the phylogenetic ridge regression method. For both the hindwing and forewing, the lineages Obtectomera: Papilloma and Macroheterocera: Noctuoidea display exceptional shifts in evolutionary rate for fore- and hindwing shapes.  
+Though there seems to be visual confirmation that hind and forewing shape evolution is correlated, through the R2 values displayed in the table above and @owens2020comparative paper, it appears that they are not strongly correlated, and most likely evolve independently of each other. This could potentially be an effect of their differing functions, which may lead to varying evolutionary trajectories and evolutionary rate changes @chazot2016morpho. 
 
 ## Author Contribution
 Ellie Falanga - Digitization, Introduction, & Results
