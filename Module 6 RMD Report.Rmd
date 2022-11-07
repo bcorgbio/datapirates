@@ -20,6 +20,8 @@ In order to determine if the rates of wing-shape evolution in the Lepidoptera we
 In order to determine if major lineages of the Lepidoptera have undergone significant shifts in evolutionary rates, Professor Christopher Kenaley provided us with the phylogenetic tree created by @kawahara2019phylogenomics Our group, datapirates, used this resource throughout the analysis. In addition to this phylogenetic tree, the R package “RRphylo” was used to determine the evolutionary rate based on wing shape. The phylogenetic ridge regression which we used comes from @kratsch2014ridgerace This determined any statistically significant shift in shape change based on the Lepidoptera’s clades yielding the name of the clade and the rate of evolutionary shift.
 *Are hind- and forewing shapes correlated?*
 In order to determine if hind- and forewing shapes are correlated, the phylogenetic independent contrast (PIC) was performed on the principal components (PC) data to separate the data from one another, summarize the character change, and estimate the character change across the phylogeny. THe PC values of both hind- and forewing data were compared using a linear model, and analysis was performed to determine if changes were statistically significant.
+
+
 ## Results
 
 ```{r,"loading libraries"}
@@ -158,7 +160,7 @@ pcvaluetable%>%
   kable(caption="PCA Values for Fore- and Hindwing of species of lepidoptera")
 ```
 
-To continue the analysis on varying hind- and forewing evolutionary rate change, we calculated evolutionary rate estimates of wing shape over the phylogenetic tree using the “noncensored test” method @o2006testing. These values are displayed in the table above for comparison among PC scores / wing combinations. 
+To continue the analysis on varying hind- and forewing evolutionary rate change, we calculated evolutionary rate estimates of wing shape over the phylogenetic tree using the “noncensored test” method @o2006testing. These values are displayed in the table above for comparison among PC scores / wing combinations. The higher the evolutionary rate estimates, the higher the overall variance of rate change observed, indicating that there appears to be more variance in rate change for the hindwing shape change compared to forewing.
 
 ```{r, "computing rates among the branches"}
 hindPC1.RR <- RRphylo(tree=lep.tree2,y=hind.pc1)
@@ -172,7 +174,7 @@ forePC1.SS <- search.shift(RR=forePC1.RR,status.type="clade")
 hindPC2.SS <- search.shift(RR=hindPC2.RR,status.type="clade")
 forePC2.SS <- search.shift(RR=forePC2.RR,status.type="clade")
 ```
-```{r,"establishing Kenaley function to extract lineage names"}
+```{r,"establishing Kenaley function to extract lineage names",include=FALSE}
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("ggtree")
@@ -276,9 +278,16 @@ After completing a summary analysis of the PIC analysis regression model, R2 val
 
 ## Discussion
 
+As indicated by the PC analysis and the evolutionary rate estimates calculated, the rates of wing-shape evolution are different between hing- and forewing of the species of Lepidoptera analyzed. The hindwing shape evolution rate seems to have higher overall rates of change than that of forewing, indicating that hindwing is more rapidly evolving. 
+
+There are two major lineages of the Lepidoptera that appear to have undergone signficiant shifts in evolutionary rate, as indicated by the phylogenetic ridge regression method. For both the hindwing and forewing, the lineages Obtectomera: Papilloma and Macroheterocera: Noctuoidea display exceptional shifts in evolutionary rate for fore- and hindwing shapes.  
+
+Though there seems to be visual confirmatino that hind and forewing shape evolution is correlated, through the R2 values displayed in the table above and @owens2020comparative paper, it appears that they are not strongly correlated, and most likely evolve independently of each other. This could potentially be an effect of their differing functions, which may lead to varying evolutionary trajectories and evolutionary rate changes @chazot2016morpho. 
+
 ## Author Contribution
 Ellie Falanga - Digitization, Introduction, & Results
 Tori Newton - Digitization, & Discussion
 Alexa Lombardi - Digitization, & Methods 
 Chris Lang - Digitization
+
 ## References
