@@ -3,7 +3,7 @@ title: "Module 6 Report"
 author: "Data Pirates"
 date: "2022-11-06"
 output: html_document
-bibliography: BIOL3140.bib
+bibliography: BIOL3140_datapirates.bib
 ---
 
 ```{r setup, include=FALSE}
