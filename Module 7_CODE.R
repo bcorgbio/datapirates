@@ -74,3 +74,18 @@ normF.pred.fat <- predict(poly.m3.fat,newdata = data.frame(angle=x.pred)) #predi
 qplot(ang.F,fnorm_fatigue)+geom_point(aes(x=x.pred,y=normF.pred.fat),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred.fat)],y=normF.pred.fat[which.max(normF.pred.fat)]),size=5,col="blue")
 
 x.pred[which.max(normF.pred.fat)]-x.pred[which.max(normF.pred)]
+
+df1%>%
+  ggplot(aes(angle,fnorm,col=activity.x))+geom_point()
+
+AICs <- df1%>%
+  group_by(who,activity.x)%>%
+  summarize(
+    m2=AICc(lm(fnorm~poly(angle,2))), #second order
+    m3=AICc(lm(fnorm~poly(angle,3))), #third order
+    m4=AICc(lm(fnorm~poly(angle,4))) #fourth order
+  )%>%
+  pivot_longer(m2:m4,names_to="model",values_to="AICc")%>%
+  print()
+
+
