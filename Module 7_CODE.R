@@ -88,4 +88,30 @@ AICs <- df1%>%
   pivot_longer(m2:m4,names_to="model",values_to="AICc")%>%
   print()
 
+fits <- df1%>%
+  group_by(who,activity.x)%>%
+  summarize(
+    m2=predict(lm(fnorm~poly(angle,2)),newdata=data.frame(angle=x.pred)), #second order
+    m3=predict(lm(fnorm~poly(angle,3)),newdata=data.frame(angle=x.pred)), #third order
+    m4=predict(lm(fnorm~poly(angle,4)),newdata=data.frame(angle=x.pred)) #fourth order
+  )%>%
+  pivot_longer(m2:m4,names_to="model")%>%
+  group_by(who,activity.x,model)%>%
+  summarize(theta_max=x.pred[which.max(value)])%>%
+  print()
 
+best.models <- fits%>%
+  left_join(AICs)%>%
+  group_by(who,activity.x)%>%
+  mutate(best=AICc==min(AICc))%>%
+  filter(best==TRUE)%>%
+  dplyr::select(-best)%>%
+  print()
+
+anova(lm(theta_max~activity.x,best.models))
+
+best.models%>%
+  pivot_wider(id_cols=who,names_from = activity.x,values_from=theta_max)%>%
+  mutate(shift=fatigue-control)%>%
+  ungroup()%>%
+  summarise(mean.shift=mean(shift),se.shift=sd(shift)/sqrt(length(shift)))
