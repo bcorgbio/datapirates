@@ -1,0 +1,66 @@
+---
+title: "Module 5"
+author: "Data Pirates"
+date: "2022-10-05"
+output: html_document
+bibliography: DataPirates.bib
+---
+
+<!-- for comments -->
+<style>
+div.comment pre { background-color:#ffbbbb; }
+div.comment pre.r { background-color:#ffbbbb; }
+div.comment {color: red;}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE)
+```
+
+# Introduction
+For this project, our group will be investigating whether a person's body temperature varies with different levels of activity. According to a study by @lim2008human , physical activity causes a substantial increase in metabolic heat production, thus increasing body temperature. To further investigate this, the temperature of four different subjects during their rest time and after 2 minutes of activity will be recorded. 
+
+# Methods
+In order to determine the relationship between body temperature and activity level, each individual had their body temperature (°C) measured from their armpit for one minute while at rest. After that has been recorded, the individual will proceed to do jumping jacks for 2 minutes and their body temperature from their armpit will be recorded a second time, representing an active state. This process will be done to all four individuals and their data will be recorded and saved accordingly. 
+
+# Results
+```{r,"adding in our own data"}
+library(tidyverse)
+dat.f <- list.files(pattern="couch|active.csv")
+dat.l <- list()
+```
+```{r, "for loop"}
+for (i in dat.f){
+  met.dat <- unlist(strsplit(i,"_"))
+  who <- met.dat[1]
+  activity <- gsub(".csv","",met.dat[2])
+  dat.l[[i]] <- read_csv(i,col_names = TRUE,col_types = NULL)%>%
+    mutate("who" = who, "activity" = activity)
+}
+```
+```{r, "making data tables"}
+dat <- do.call(rbind,dat.l)
+
+```
+```{r,"[plotting tables",fig.cap= "Individuals' varying temperatures over time during different states of activity; one in a state of rest (couch) and the other, during physical activity (active)"}
+plot <- dat%>%
+  ggplot(aes(x=activity,y=degC))+geom_boxplot()+stat_summary(fun=mean,geom="point",size=3)+geom_errorbar(aes(ymin=degC-sd(degC), ymax=degC+sd(degC)),width=.002)+ylab("Body Temperature (Degrees Celsius)")+facet_grid(.~who)
+print(plot)
+```
+
+Based off of the findings in the plot above, it appears that body temperature fluctuation during physical activity compared with temperature during rest does not drastically vary, for a majority of individuals that were tested. This suggests that physical activity does not have a direct affect on changing body temperature. 
+
+# Discussion
+@gleeson1998temperature also studied temperature regulation during exercise and found similar results. This paper discussed how during exercise the body produces excess heat, some of which gets stored which slightly raises the body core temperature. The rest of the heat gets dissipated from the body through evaporation of sweat and increased skin blood flow. These heat regulation mechanisms of the body causes body temperature to remain relatively constant regardless of activity level which is congruent with our findings.
+
+# Author Contribution
+* Chris - Wrote Introduction and Methods paragraphs
+* Alexa - Recorded, saved, and properly mamed data and reviewed and edited project report
+* Ellie - Put metadata in table and created results graph; wrote results narrative on findings. 
+* Tori - Wrote Discussion section and assembled the Arduino board
+
+<div class="comment">
+Hit it out of the park!!! Great figure, clear and concise analysis, and some nice contexual remarks concerning the literature. 15/15
+
+</div>
+# References
