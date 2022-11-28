@@ -3,7 +3,7 @@ title: "Module 7"
 author: "Data Pirates"
 date: "2022-11-27"
 output: html_document
-bibliography:BIOL3140_datapirates_mod7.bib
+bibliography: BIOL3140_datapirates_mod7.bib
 ---
 
 ```{r setup, include=FALSE}
