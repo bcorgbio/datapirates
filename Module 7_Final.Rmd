@@ -49,11 +49,11 @@ dat1$X1 <- gsub("lbs","",as.character(dat1$X1))
 dat1$X1 <- as.numeric(as.character(dat1$X1))
 ```
 ```{r,"calculating max values and Fmax to get normalized force value"}
-max_value <- dat1%>%
+max_value <- data.frame(dat1)%>%
   group_by(who,angle,activity)%>%
   slice(which.max(X1))
 
-fmax <- dat1%>%
+fmax <- data.frame(dat1)%>%
   group_by(activity,who)%>%
   slice(which.max(X1))
 colnames(fmax) <- c("FMAX","who","angle_max","activity")
