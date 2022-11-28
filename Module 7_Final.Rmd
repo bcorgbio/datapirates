@@ -90,7 +90,7 @@ normF.pred <- predict(poly.m4,newdata = data.frame(angle=x.pred)) #predict the f
 qplot(ang.C,fnorm_control)+geom_point(aes(x=x.pred,y=normF.pred),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred)],y=normF.pred[which.max(normF.pred)]),size=5,col="blue")+ylab("Normalized Force")+xlab("Angle")
                                                                                                   
 ```
-The points plotted above are the normalized force values for each participant, under the controlled condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a fourth degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our control data is to the predictive model Fmax and θmax. 
+The points plotted above are the normalized force values for each participant, under the controlled condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a fourth degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our control data is to the predictive model Fmax and θmax.The curve the data trends towards shows that the data of our class does not follow a relatively normal human muscle force-length relationship, as described in the discussion. 
 
 ```{r,"linear models for fatigue",results='hide'}
 poly.m2.fat <- lm(fnorm~poly(angle,2),df1_fatigue) #second order
@@ -104,7 +104,7 @@ normF.pred.fat <- predict(poly.m3.fat,newdata = data.frame(angle=x.pred)) #predi
 
 qplot(ang.F,fnorm_fatigue)+geom_point(aes(x=x.pred,y=normF.pred.fat),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred.fat)],y=normF.pred.fat[which.max(normF.pred.fat)]),size=5,col="blue")+ylab("Normalized Force")+xlab("Angle")
 ```
-The points plotted above are the normalized force values for each participant, under the fatigued condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a third degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our fatigue data is to the predictive model Fmax and θmax. 
+The points plotted above are the normalized force values for each participant, under the fatigued condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a third degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our fatigue data is to the predictive model Fmax and θmax. The curve the data trends towards shows that the data of our class does not follow a relatively normal human muscle force-length relationship, as described in the discussion. 
 ```{r,"prediction model angle maxes vs. actual data",results='hide"}
 x.pred[which.max(normF.pred.fat)]-x.pred[which.max(normF.pred)]
 ang.F[which.max(fnorm_fatigue)]-ang.C[which.max(fnorm_control)]
@@ -170,13 +170,13 @@ best.models%>%
 ```
 Here we calculated the mean shift with SEM. First we made sure to isolate θmax for each experiment, calculated the differences between them, and then calculated the mean and standard error of these shift differences. 
 ## Discussion
-
-
+  Under both control and fatigued conditions, the class-wide force angle information for isometric MVC doesn’t seem to follow a usual force-length relationship. According to a normal force-length relationship, muscles produce the most force when they are at their optimal length and the least force when they are in the shortened or stretched position in comparison to their resting length. A decrease in output force would be anticipated for high angle values. This module project examined the effects of fatigue on the force-length relationship of the human upper limbs and the link between length and muscle force generation. 
+	According to @article{rassier1999length, a typical force-length relationship’s force should increase, plateau, and then decrease after the idea angle is reached. However, according to our class-wide data, there was about a twenty-two degree difference between θmax of the control and fatigue groups. The θmax for the control group was somewhere between 135 to 140 degrees, while the θmax for the fatigued group was somewhere between 150 to 160 degrees. As confirmed by ANOVA, for θmax in the control and fatigue groups, the difference was considered significant at the 5% level. With regard to upper arm biomechanics specifically, this data offers further analysis of human movement and muscle function. 
 
 ## Author Contribution
 Ellie Falanga - Data Collection, & Results
 Tori Newton - Data Collection, & Introduction
 Alexa Lombardi - Data Collection, & Methods
-Chris Lang - Data Collection, & Discussion
+Chris Pang - Data Collection, & Discussion
 
 ## References
