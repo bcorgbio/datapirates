@@ -105,7 +105,7 @@ normF.pred.fat <- predict(poly.m3.fat,newdata = data.frame(angle=x.pred)) #predi
 qplot(ang.F,fnorm_fatigue)+geom_point(aes(x=x.pred,y=normF.pred.fat),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred.fat)],y=normF.pred.fat[which.max(normF.pred.fat)]),size=5,col="blue")+ylab("Normalized Force")+xlab("Angle")
 ```
 The points plotted above are the normalized force values for each participant, under the fatigued condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a third degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our fatigue data is to the predictive model Fmax and θmax. The curve the data trends towards shows that the data of our class does not follow a relatively normal human muscle force-length relationship, as described in the discussion. 
-```{r,"prediction model angle maxes vs. actual data",results='hide"}
+```{r,"prediction model angle maxes vs. actual data",results='hide'}
 x.pred[which.max(normF.pred.fat)]-x.pred[which.max(normF.pred)]
 ang.F[which.max(fnorm_fatigue)]-ang.C[which.max(fnorm_control)]
 thetamax_diff_tibble <- tibble(Model="1000 Angle Prediction Model",ThetaDifference=x.pred[which.max(normF.pred.fat)]-x.pred[which.max(normF.pred)])
