@@ -15,8 +15,12 @@ This project explored the effect of length on muscle force generation and evalua
 
 The human arm can be considered a 3rd order lever which also has a mechanical advantage that predicts the amount of output force transmitted by the input force. The input moment arm changes as the forearm flexes since the insertion angle changes as the forearm rotates. For this project, we followed the assumption that the force measured at the hand as the muscle produced isometric force at various lengths is a reasonable reflection of the force length relationship governing force at the fiber level. This project produced isometric force angle curves for the human forearm flexors undertaking maximum voluntary contractions at a number of different elbow angles in order to compare the angle at which the maximum isometric force occurs between non-fatigued and eccentrically fatigued forearm flexors.
 
-
 ## Methods
+For our Module 7 Project on the effect of length on muscle force, or the force-length (FL) relationship, and the effect of fatigue on this relationship as well, we carried out various trials of a pre-designed experiment. Our experiment was designed using an Arduino force-data acquisition device.
+*Do class-wide force-angle data for isometric MVC accord to a typical FL relationship both under control and fatigued conditions?*
+In order to determine if class-wide force-angle data for isometric MVC accord to a typical FL relationship under both control and fatigued conditions, we carried out specific methods. Ellie designed a goniometer, a device capable of measuring the available range of motion for a particular joint. In our experiment, we were measuring the angle between the upper-arm and forearm. This device would allow us to collect data throughout the experiment for 30 seconds of force. We designed a systematic way to take these measurements. We centered the goniometer on our elbow and taped it down on this spot. Making sure that the goniometer was centered was a crucial part of this experiment to ensure angles were properly recorded and performed. Each subject measured 12 arm angles at around 11 degree intervals ranging from 45 degrees to 157.5 degrees. The 12 angles provided us with the MVC. We marked a line along the radius to assist our subject in pulling the correct angle for each round of the experiment. The subject used the same arm for entirety of the experiment, and this was the arm they considered their “stronger” arm. The Arduino-based force-data acquisition device has two hooks. The first hook was placed around a wooden dowel which the subject held onto to complete the pulling motions. The second hook was placed under a table or chair, depending on the appropriateness of the height, to work as a base. This process was repeated for both fatigue and control conditions. Control conditions were performed after no physical activity, while fatigue conditions were performed after 3 minutes of continuous isokinetic controlled drops of a heavy object. The heavy object chosen was determined by having a weight around ⅓ of our maximum isometric force recorded in the control experiments. For this process, the subject would pick up the weighted object with their non-testing arm and pass it to their fully extended testing arm. After holding the object for a few seconds, the subject would flex their arm and repeat this process for 3 minutes until their arm was fully fatigued.
+*Is there a significant shift between θmax between the control and fatigue FL relationships?*
+In order to successfully determine if there was a significant shift between θmax in the control and fatigue FL relationships, we performed a few key steps. We normalized the isometric force in each trial by quantifying each force as a fraction of the highest force measured for that subject (one of the students) under those conditions (control or fatigue). We determined the best polynomial relationship model for each trial of subject and conditions under AIC conditions and recorded accurate relationships among these maximum force producing angles. We also determined θmax, or the maximum elbow angle at which maximum MVC force occurs and discarded all θmax values that did not correspond to the best fitting model under each set of conditions. The significance of the mean shift between the two conditions (control and fatigue) was tested using ANOVA, an analysis of variance, and the mean and SEM were calculated for the shift in θmax.
 
 ## Results
 ```{r,"loading in libraries"}
@@ -39,16 +43,17 @@ for(i in f){
     mutate(who=who,angle=angle,activity=activity)
 }
 dat <- do.call(rbind,dat.l)
-dat$X1<-gsub("Reading: ","",as.character(dat$X1))
-dat$X1 <- gsub("lbs","",as.character(dat$X1))
-dat$X1 <- as.numeric(as.character(dat$X1))
+dat1 <- dat[dat$who!=25,]
+dat1$X1<-gsub("Reading: ","",as.character(dat1$X1))
+dat1$X1 <- gsub("lbs","",as.character(dat1$X1))
+dat1$X1 <- as.numeric(as.character(dat1$X1))
 ```
-```{r,"calculating max values and Fmax to add to table"}
-max_value <- dat%>%
+```{r,"calculating max values and Fmax to get normalized force value"}
+max_value <- dat1%>%
   group_by(who,angle,activity)%>%
   slice(which.max(X1))
 
-fmax <- dat%>%
+fmax <- dat1%>%
   group_by(activity,who)%>%
   slice(which.max(X1))
 colnames(fmax) <- c("FMAX","who","angle_max","activity")
@@ -85,7 +90,8 @@ normF.pred <- predict(poly.m4,newdata = data.frame(angle=x.pred)) #predict the f
 qplot(ang.C,fnorm_control)+geom_point(aes(x=x.pred,y=normF.pred),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred)],y=normF.pred[which.max(normF.pred)]),size=5,col="blue")+ylab("Normalized Force")+xlab("Angle")
                                                                                                   
 ```
-Caption for graph 1 -- CONTROL force data vs. prediction model 
+The points plotted above are the normalized force values for each participant, under the controlled condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a fourth degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our control data is to the predictive model Fmax and θmax. 
+
 ```{r,"linear models for fatigue",results='hide'}
 poly.m2.fat <- lm(fnorm~poly(angle,2),df1_fatigue) #second order
 poly.m3.fat <- lm(fnorm~poly(angle,3),df1_fatigue) #third order
@@ -98,7 +104,7 @@ normF.pred.fat <- predict(poly.m3.fat,newdata = data.frame(angle=x.pred)) #predi
 
 qplot(ang.F,fnorm_fatigue)+geom_point(aes(x=x.pred,y=normF.pred.fat),col="red")+geom_point(aes(x=x.pred[which.max(normF.pred.fat)],y=normF.pred.fat[which.max(normF.pred.fat)]),size=5,col="blue")+ylab("Normalized Force")+xlab("Angle")
 ```
-Caption for graph 2 -- FATIGUE force data vs. prediction model. 
+The points plotted above are the normalized force values for each participant, under the fatigued condition, at each arm angle. The red line depicts the strongest linear-fit model that we calculated (found to be a third degree model). Using this best fit linear model, the blue dot represents the Fmax and θmax of this predictive model, which, plotted against actual data, gives an idea of how close our fatigue data is to the predictive model Fmax and θmax. 
 ```{r,"prediction model angle maxes vs. actual data",results='hide"}
 x.pred[which.max(normF.pred.fat)]-x.pred[which.max(normF.pred)]
 ang.F[which.max(fnorm_fatigue)]-ang.C[which.max(fnorm_control)]
@@ -108,12 +114,13 @@ thetadifftable <- thetamax_diff_tibble%>%
 thetadifftable%>%
   kable(caption="Shift in Angle for Fmax in both 1000-Angle predictive model and in class data")
 ```
-Caption for difference in predictive model vs. data (based off linear models for each)
+Here, we calculated the difference in theta max among experiments (control vs. fatigue) for the predicted model, with 1000 Angle measurements, vs. our class data. We found that for Fmax, there was no shift in theta for the predicted model, though there was a slight shift for actual class data. 
+
 ```{r,"comparing control vs. fatigue data graphically" }
 df1%>%
   ggplot(aes(angle,fnorm,col=activity.x))+geom_point()+ylab("Normalized Force")+xlab("Angle")
 ```
-Caption for graph -- control vs. fatigue 
+Here is the plot of the normalized force per angle, with a particular visualization of the difference between the control and fatigue experiments. It does not appear from this graphical representation that the class data follows a strong trend in terms of force v. angle relationships with varying conditions. From  visual observation, it appears a majority of control experiments had higher normalized force across all angle measurments compared to fatigued muscles, with some fluctuation among participants. 
 
 ```{r,"figuring out best fit AIC model for data",results='hide'}
 AICs <- df1%>%
@@ -146,11 +153,30 @@ best.models <- fits%>%
   dplyr::select(-best)%>%
   print()
 ```
+```{r,"anova test",results='hide'}
+anova(lm(theta_max~activity.x,best.models))
+anovatibble <- tibble(Variable="Experiment",Df=1,SumSq=986,MeanSq=985.97,Fvalue=4.8055,Pvalue=0.03287)
+anovatibble%>%
+  kable(caption="ANOVA scores for ThetaMax vs. Experiment Type based on best fitting model")
+```
+An ANOVA test was conducted on the best fit AIC model to the data to determine whether the shift of θmax is different between the control and fatigue experiments. Since the experimental F value falls under the <.05 p value threshold, it is  likely that the mean of all fatigue conditions differ from the mean of all control conditions by about 4.8055, a relatively low variance Thus, there does not appear to be much of a shift in θmax across the varying conditions. 
 
+```{r,"calculating mean and standard error shifts"}
+best.models%>%
+  pivot_wider(id_cols=who,names_from = activity.x,values_from=theta_max)%>%
+  mutate(shift=fatigue-control)%>%
+  ungroup()%>%
+  summarise(mean.shift=mean(shift),se.shift=sd(shift)/sqrt(length(shift)))
+```
+Here we calculated the mean shift with SEM. First we made sure to isolate θmax for each experiment, calculated the differences between them, and then calculated the mean and standard error of these shift differences. 
 ## Discussion
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Author Contribution
+Ellie Falanga - Data Collection, & Results
+Tori Newton - Data Collection, & Introduction
+Alexa Lombardi - Data Collection, & Methods
+Chris Lang - Data Collection, & Discussion
+
+## References
