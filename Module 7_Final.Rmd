@@ -15,8 +15,12 @@ This project explored the effect of length on muscle force generation and evalua
 
 The human arm can be considered a 3rd order lever which also has a mechanical advantage that predicts the amount of output force transmitted by the input force. The input moment arm changes as the forearm flexes since the insertion angle changes as the forearm rotates. For this project, we followed the assumption that the force measured at the hand as the muscle produced isometric force at various lengths is a reasonable reflection of the force length relationship governing force at the fiber level. This project produced isometric force angle curves for the human forearm flexors undertaking maximum voluntary contractions at a number of different elbow angles in order to compare the angle at which the maximum isometric force occurs between non-fatigued and eccentrically fatigued forearm flexors.
 
-
 ## Methods
+For our Module 7 Project on the effect of length on muscle force, or the force-length (FL) relationship, and the effect of fatigue on this relationship as well, we carried out various trials of a pre-designed experiment. Our experiment was designed using an Arduino force-data acquisition device.
+*Do class-wide force-angle data for isometric MVC accord to a typical FL relationship both under control and fatigued conditions?*
+In order to determine if class-wide force-angle data for isometric MVC accord to a typical FL relationship under both control and fatigued conditions, we carried out specific methods. Ellie designed a goniometer, a device capable of measuring the available range of motion for a particular joint. In our experiment, we were measuring the angle between the upper-arm and forearm. This device would allow us to collect data throughout the experiment for 30 seconds of force. We designed a systematic way to take these measurements. We centered the goniometer on our elbow and taped it down on this spot. Making sure that the goniometer was centered was a crucial part of this experiment to ensure angles were properly recorded and performed. Each subject measured 12 arm angles at around 11 degree intervals ranging from 45 degrees to 157.5 degrees. The 12 angles provided us with the MVC. We marked a line along the radius to assist our subject in pulling the correct angle for each round of the experiment. The subject used the same arm for entirety of the experiment, and this was the arm they considered their “stronger” arm. The Arduino-based force-data acquisition device has two hooks. The first hook was placed around a wooden dowel which the subject held onto to complete the pulling motions. The second hook was placed under a table or chair, depending on the appropriateness of the height, to work as a base. This process was repeated for both fatigue and control conditions. Control conditions were performed after no physical activity, while fatigue conditions were performed after 3 minutes of continuous isokinetic controlled drops of a heavy object. The heavy object chosen was determined by having a weight around ⅓ of our maximum isometric force recorded in the control experiments. For this process, the subject would pick up the weighted object with their non-testing arm and pass it to their fully extended testing arm. After holding the object for a few seconds, the subject would flex their arm and repeat this process for 3 minutes until their arm was fully fatigued.
+*Is there a significant shift between θmax between the control and fatigue FL relationships?*
+In order to successfully determine if there was a significant shift between θmax in the control and fatigue FL relationships, we performed a few key steps. We normalized the isometric force in each trial by quantifying each force as a fraction of the highest force measured for that subject (one of the students) under those conditions (control or fatigue). We determined the best polynomial relationship model for each trial of subject and conditions under AIC conditions and recorded accurate relationships among these maximum force producing angles. We also determined θmax, or the maximum elbow angle at which maximum MVC force occurs and discarded all θmax values that did not correspond to the best fitting model under each set of conditions. The significance of the mean shift between the two conditions (control and fatigue) was tested using ANOVA, an analysis of variance, and the mean and SEM were calculated for the shift in θmax.
 
 ## Results
 ```{r,"loading in libraries"}
@@ -154,3 +158,11 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+## Author Contribution
+Ellie Falanga - Data Collection, & Results
+Tori Newton - Data Collection, & Introduction
+Alexa Lombardi - Data Collection, & Methods
+Chris Lang - Data Collection, & Discussion
+
+## References
