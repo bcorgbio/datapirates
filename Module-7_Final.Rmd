@@ -39,7 +39,7 @@ for(i in f){
   who <- met.dat[2] 
   angle <- met.dat[3]
   activity <- gsub(".csv","",met.dat[4]) 
-  dat.l[[i]]<- read_csv(i,col_names=FALSE,progress=FALSE)%>%
+  dat.l[[i]]<- read_csv(i,col_names=FALSE)%>%
     mutate(who=who,angle=angle,activity=activity)
 }
 dat <- do.call(rbind,dat.l)
